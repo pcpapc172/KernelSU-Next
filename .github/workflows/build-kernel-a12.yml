@@ -17,6 +17,7 @@ on:
       - "kernel/**"
   workflow_call:
   workflow_dispatch:
+
 jobs:
   build-kernel:
     if: github.event_name != 'pull_request' && github.ref != 'refs/heads/next'
@@ -24,7 +25,7 @@ jobs:
       matrix:
         include:
           - sub_level: 240
-            os_patch_level: 2026-05
+            os_patch_level: 2025-12
     uses: ./.github/workflows/gki-kernel.yml
     secrets: inherit
     with:
@@ -33,11 +34,11 @@ jobs:
       tag: android12-5.10-${{ matrix.os_patch_level }}
       os_patch_level: ${{ matrix.os_patch_level }}
       patch_path: "5.10"
-  
+
   upload-artifacts:
     needs: build-kernel
     runs-on: ubuntu-latest
-    if: ${{ ( github.event_name != 'pull_request' && github.ref == 'refs/heads/next' ) || github.ref_type == 'tag' || github.ref == 'refs/heads/next' }}
+    if: ${{ github.event_name != 'pull_request' }}
     env:
       CHAT_ID: ${{ secrets.CHAT_ID }}
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
@@ -112,6 +113,6 @@ jobs:
     with:
       version: android12-5.10
       version_name: android12-5.10.240
-      tag: android12-5.10-2026-05
-      os_patch_level: 2026-05
+      tag: android12-5.10-2025-12
+      os_patch_level: 2025-12
       patch_path: "5.10"
