@@ -16,22 +16,15 @@ on:
       - ".github/scripts/build-a12.sh"
       - "kernel/**"
   workflow_call:
+  workflow_dispatch:
 jobs:
   build-kernel:
     if: github.event_name != 'pull_request' && github.ref != 'refs/heads/next'
     strategy:
       matrix:
         include:
-          - sub_level: 218
-            os_patch_level: 2024-08
-          - sub_level: 226
-            os_patch_level: 2024-11
-          - sub_level: 233
-            os_patch_level: 2025-02
-          - sub_level: 236
-            os_patch_level: 2025-05
-          - sub_level: 237
-            os_patch_level: 2025-06
+          - sub_level: 240
+            os_patch_level: 2026-05
     uses: ./.github/workflows/gki-kernel.yml
     secrets: inherit
     with:
@@ -118,7 +111,7 @@ jobs:
     uses: ./.github/workflows/gki-kernel.yml
     with:
       version: android12-5.10
-      version_name: android12-5.10.237
-      tag: android12-5.10-2025-06
-      os_patch_level: 2025-06
+      version_name: android12-5.10.240
+      tag: android12-5.10-2026-05
+      os_patch_level: 2026-05
       patch_path: "5.10"
