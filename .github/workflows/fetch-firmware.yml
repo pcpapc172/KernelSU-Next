@@ -1,0 +1,32 @@
+name: Fetch firmware images
+on:
+  workflow_dispatch:
+    inputs:
+      boot_url:
+        description: 'URL for boot.img'
+        required: true
+        type: string
+      vendor_boot_url:
+        description: 'URL for vendor_boot.img'
+        required: true
+        type: string
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download images
+        run: |
+          curl -L -o boot.img "${{ inputs.boot_url }}"
+          curl -L -o vendor_boot.img "${{ inputs.vendor_boot_url }}"
+          ls -la boot.img vendor_boot.img
+          file boot.img vendor_boot.img
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-images
+          path: |
+            boot.img
+            vendor_boot.img
+          retention-days: 1
