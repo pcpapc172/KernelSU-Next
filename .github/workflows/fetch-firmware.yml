@@ -1,15 +1,10 @@
 name: Fetch firmware images
 on:
-  workflow_dispatch:
-    inputs:
-      boot_url:
-        description: 'URL for boot.img'
-        required: true
-        type: string
-      vendor_boot_url:
-        description: 'URL for vendor_boot.img'
-        required: true
-        type: string
+  push:
+    branches:
+      - claude/ksun-susfs-anykernel3-zip-2j28zf
+    paths:
+      - '.github/workflows/fetch-firmware.yml'
 
 jobs:
   fetch:
@@ -17,8 +12,8 @@ jobs:
     steps:
       - name: Download images
         run: |
-          curl -L -o boot.img "${{ inputs.boot_url }}"
-          curl -L -o vendor_boot.img "${{ inputs.vendor_boot_url }}"
+          curl -L -o boot.img "https://filesto.o2zone.space/d/TYfID44"
+          curl -L -o vendor_boot.img "https://filesto.o2zone.space/d/LQRBvgz"
           ls -la boot.img vendor_boot.img
           file boot.img vendor_boot.img
 
