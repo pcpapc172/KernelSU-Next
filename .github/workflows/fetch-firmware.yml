@@ -20,29 +20,30 @@ jobs:
       - name: Download images
         run: |
           mkdir -p firmware-tmp
-          curl -L --fail -o firmware-tmp/boot_new.img "https://filesto.o2zone.space/d/P0OfB9t"
+          curl -L --fail -o firmware-tmp/manager.apk "https://filesto.o2zone.space/d/ea0kimg"
+          curl -L --fail -o firmware-tmp/manager-spoofed.apk "https://filesto.o2zone.space/d/fwsW2gD"
           ls -la firmware-tmp/
           file firmware-tmp/*
 
       - name: Validate downloads
         run: |
-          boot_size=$(stat -c%s firmware-tmp/boot_new.img)
-          echo "boot_new.img: $boot_size bytes"
-
-          if [ "$boot_size" -lt 30000000 ]; then
-            echo "::error::boot_new.img is only $boot_size bytes, expected tens of MB. Likely got an HTML/error page instead of the real file."
-            head -c 500 firmware-tmp/boot_new.img
-            exit 1
-          fi
-
-          if ! file firmware-tmp/boot_new.img | grep -qi "android\|boot\|gzip\|LZ4\|data"; then
-            echo "::warning::boot_new.img file type looks unexpected: $(file firmware-tmp/boot_new.img)"
-          fi
+          for f in manager.apk manager-spoofed.apk; do
+            size=$(stat -c%s "firmware-tmp/$f")
+            echo "$f: $size bytes"
+            if [ "$size" -lt 1000000 ]; then
+              echo "::error::$f is only $size bytes, expected several MB. Likely got an HTML/error page instead of the real file."
+              head -c 500 "firmware-tmp/$f"
+              exit 1
+            fi
+            if ! file "firmware-tmp/$f" | grep -qi "zip\|android"; then
+              echo "::warning::$f file type looks unexpected: $(file "firmware-tmp/$f")"
+            fi
+          done
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f firmware-tmp/boot_new.img
-          git commit -m "Add updated boot.img for diagnosis (temporary)"
+          git add -f firmware-tmp/manager.apk firmware-tmp/manager-spoofed.apk
+          git commit -m "Add KernelSU-Next Manager APKs (manager + manager-spoofed)"
           git push origin HEAD:claude/ksun-susfs-anykernel3-zip-2j28zf
